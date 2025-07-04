@@ -3,6 +3,7 @@ dotenv.config();
 import express from 'express';
 import morgan from 'morgan';
 import cors from 'cors';
+import apiRoutes from './routes';
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -36,6 +37,8 @@ app.get('/health', (req, res) => {
     timestamp: new Date().toISOString()
   });
 });
+
+app.use('/api', apiRoutes);
 
 app.listen(PORT, () => {
   console.log(`API Server running on port ${PORT}`);
