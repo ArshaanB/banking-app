@@ -29,6 +29,29 @@ class InMemoryStore {
     return this.accounts.find((account) => account.id === id);
   }
 
+  async updateAccountBalance(id: string, balance: number): Promise<Account> {
+    const account = this.accounts.find((a) => a.id === id)!;
+    account.balance = balance;
+    return account;
+  }
+
+  async createTransaction(transaction: Transaction): Promise<Transaction> {
+    this.transactions.push(transaction);
+    return transaction;
+  }
+
+  async getTransactionById(id: string): Promise<Transaction | undefined> {
+    return this.transactions.find((transaction) => transaction.id === id);
+  }
+
+  async getTransactionsByAccountId(accountId: string): Promise<Transaction[]> {
+    return this.transactions.filter(
+      (transaction) =>
+        transaction.fromAccountId === accountId ||
+        transaction.toAccountId === accountId
+    );
+  }
+
   async clearAll() {
     this.customers = [];
     this.accounts = [];

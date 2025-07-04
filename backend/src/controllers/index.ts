@@ -1,6 +1,10 @@
 import { Request, Response } from 'express';
 import { CustomerService, AccountService } from '../services';
-import { CreateCustomerRequest, CreateAccountRequest } from '../models';
+import {
+  CreateCustomerRequest,
+  CreateAccountRequest,
+  TransferRequest
+} from '../models';
 
 export class CustomerController {
   // POST /api/customers
@@ -41,13 +45,34 @@ export class AccountController {
       const account = await AccountService.createAccount(requestBody);
       return res.status(201).json(account);
     } catch (error) {
-      console.error(error);
+      return res
+        .status(500)
+        .json({ error: '[Service] Failed to create account' });
+    }
+  }
 
-      if (error instanceof Error) {
-        return res.status(500).json({ error: error.message });
-      }
+  // POST /api/accounts/transfer
+  static async transfer(req: Request, res: Response) {
+    const requestBody: TransferRequest = req.body;
+    if (!requestBody.fromAccountId) {
+      return res.status(400).json({ error: 'From account ID is required' });
+    }
 
-      return res.status(500).json({ error: 'An unexpected error occurred' });
+    if (!requestBody.toAccountId) {
+      return res.status(400).json({ error: 'To account ID is required' });
+    }
+
+    if (!requestBody.amount || requestBody.amount <= 0) {
+      return res.status(400).json({ error: 'A valid amount is required' });
+    }
+
+    try {
+      const transaction = await AccountService.transfer(requestBody);
+      return res.status(201).json(transaction);
+    } catch (error) {
+      return res
+        .status(500)
+        .json({ error: '[Service] Failed to transfer funds' });
     }
   }
 }

@@ -7,4 +7,6 @@ router.post('/customers', CustomerController.createCustomer);
 
 router.post('/accounts', AccountController.createAccount);
 
+router.post('/transfers', AccountController.transfer);
+
 export default router;
