@@ -1,0 +1,24 @@
+# Dependencies
+backend/node_modules/
+frontend/node_modules/
+
+# TypeScript output
+backend/dist/
+
+# environment variables files
+backend/.env*
+frontend/.env*
+
+# Next.js build output
+frontend/.next/
+frontend/out/
+frontend/build
+
+# OS generated files
+.DS_Store
+frontend/.DS_Store
+backend/.DS_Store
+
+# Vitest
+backend/.vitest/ 
+frontend/.vitest/ 
