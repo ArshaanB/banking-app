@@ -27,6 +27,21 @@ export class CustomerController {
       return res.status(500).json({ error: 'An unexpected error occurred' });
     }
   }
+
+  // GET /api/customers/:customerId
+  static async getCustomerById(req: Request, res: Response) {
+    const { customerId } = req.params;
+    if (!customerId) {
+      return res.status(400).json({ error: 'Customer ID is required' });
+    }
+
+    try {
+      const customer = await CustomerService.getCustomerById(customerId);
+      return res.status(200).json(customer);
+    } catch (error) {
+      return res.status(404).json({ error: 'Customer not found' });
+    }
+  }
 }
 
 export class AccountController {

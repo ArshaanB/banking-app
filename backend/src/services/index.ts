@@ -23,6 +23,14 @@ export class CustomerService {
       throw new Error('Failed to create customer');
     }
   }
+
+  static async getCustomerById(customerId: string): Promise<Customer> {
+    const customer = await store.getCustomerById(customerId);
+    if (!customer) {
+      throw new Error('Customer not found');
+    }
+    return customer;
+  }
 }
 
 export class AccountService {
