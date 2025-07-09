@@ -70,6 +70,18 @@ export class AccountService {
     }
   }
 
+  static async getAccountById(accountId: string): Promise<Account> {
+    try {
+      const account = await store.getAccountById(accountId);
+      if (!account) {
+        throw new Error('Account not found');
+      }
+      return account;
+    } catch (error) {
+      throw error;
+    }
+  }
+
   static async transfer(request: TransferRequest): Promise<Transaction> {
     const fromAccount = await store.getAccountById(request.fromAccountId);
     if (!fromAccount) {

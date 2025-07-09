@@ -4,7 +4,8 @@ import {
   CreateCustomerRequest,
   GetCustomerByIdRequest,
   CreateAccountRequest,
-  TransferRequest
+  TransferRequest,
+  GetAccountByIdRequest
 } from '../models';
 
 export class CustomerController {
@@ -77,6 +78,32 @@ export class AccountController {
     try {
       const account = await AccountService.createAccount(requestBody);
       return res.status(201).json(account);
+    } catch (error) {
+      console.error(error);
+
+      if (error instanceof Error) {
+        return res.status(500).json({ error: error.message });
+      }
+
+      return res.status(500).json({ error: 'An unexpected error occurred' });
+    }
+  }
+
+  // GET /api/accounts/:accountId
+  static async getAccountById(
+    req: Request<GetAccountByIdRequest>,
+    res: Response
+  ) {
+    const requestParams: GetAccountByIdRequest = req.params;
+    if (!requestParams.accountId) {
+      return res.status(400).json({ error: 'Account ID is required' });
+    }
+
+    try {
+      const account = await AccountService.getAccountById(
+        requestParams.accountId
+      );
+      return res.status(200).json(account);
     } catch (error) {
       console.error(error);
 

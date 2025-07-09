@@ -37,6 +37,10 @@ interface CreateAccountRequest {
   balance: number;
 }
 
+interface GetAccountByIdRequest {
+  accountId: string;
+}
+
 interface TransferRequest {
   fromAccountId: string;
   toAccountId: string;
@@ -50,5 +54,6 @@ export {
   CreateCustomerRequest,
   GetCustomerByIdRequest,
   CreateAccountRequest,
+  GetAccountByIdRequest,
   TransferRequest
 };
