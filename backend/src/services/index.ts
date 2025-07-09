@@ -50,7 +50,7 @@ export class AccountService {
       throw new Error('Customer not found');
     }
     if (request.balance <= 0) {
-      throw new Error('Balance must be greater than 0');
+      throw new Error('Initial balance must be greater than 0');
     }
 
     const newAccount = {
@@ -60,9 +60,13 @@ export class AccountService {
       updatedAt: new Date()
     };
     try {
-      return store.createAccount(newAccount);
+      const account = await store.createAccount(newAccount);
+      if (!account) {
+        throw new Error('Failed to create account');
+      }
+      return account;
     } catch (error) {
-      throw new Error('Failed to create account');
+      throw error;
     }
   }
 

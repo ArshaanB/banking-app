@@ -2,7 +2,7 @@ import { Customer, Account, Transaction } from '../models';
 
 class InMemoryStore {
   private customers: Map<string, Customer> = new Map<string, Customer>();
-  private accounts: Account[] = [];
+  private accounts: Map<string, Account> = new Map<string, Account>();
   private transactions: Transaction[] = [];
 
   async createCustomer(customer: Customer): Promise<Customer> {
@@ -15,12 +15,12 @@ class InMemoryStore {
   }
 
   async createAccount(account: Account): Promise<Account> {
-    this.accounts.push(account);
+    this.accounts.set(account.id, account);
     return account;
   }
 
   async getAccountById(id: string): Promise<Account | undefined> {
-    return this.accounts.find((account) => account.id === id);
+    return this.accounts.get(id);
   }
 
   async updateAccountBalance(id: string, balance: number): Promise<Account> {
@@ -48,7 +48,7 @@ class InMemoryStore {
 
   async clearAll() {
     this.customers.clear();
-    this.accounts = [];
+    this.accounts.clear();
     this.transactions = [];
   }
 }

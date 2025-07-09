@@ -61,7 +61,10 @@ export class CustomerController {
 
 export class AccountController {
   // POST /api/accounts
-  static async createAccount(req: Request, res: Response) {
+  static async createAccount(
+    req: Request<{}, any, CreateAccountRequest>,
+    res: Response
+  ) {
     const requestBody: CreateAccountRequest = req.body;
     if (!requestBody.customerId) {
       return res.status(400).json({ error: 'Customer ID is required' });
@@ -75,9 +78,13 @@ export class AccountController {
       const account = await AccountService.createAccount(requestBody);
       return res.status(201).json(account);
     } catch (error) {
-      return res
-        .status(500)
-        .json({ error: '[Service] Failed to create account' });
+      console.error(error);
+
+      if (error instanceof Error) {
+        return res.status(500).json({ error: error.message });
+      }
+
+      return res.status(500).json({ error: 'An unexpected error occurred' });
     }
   }
 
