@@ -98,38 +98,25 @@ export class AccountService {
     }
 
     if (fromAccount.balance < request.amount) {
-      throw new Error('Insufficient funds');
+      throw new Error('Insufficient funds to transfer');
     }
 
     const transaction = {
+      ...request,
       id: randomUUID(),
-      fromAccountId: fromAccount.id,
-      toAccountId: toAccount.id,
-      amount: request.amount,
       createdAt: new Date(),
       updatedAt: new Date()
     };
 
     try {
-      const updatedFromAccount = {
-        id: fromAccount.id,
-        balance: fromAccount.balance - request.amount
-      };
-      const updatedToAccount = {
-        id: toAccount.id,
-        balance: toAccount.balance + request.amount
-      };
-      await store.updateAccountBalance(
-        updatedFromAccount.id,
-        updatedFromAccount.balance
-      );
-      await store.updateAccountBalance(
-        updatedToAccount.id,
-        updatedToAccount.balance
-      );
-      return store.createTransaction(transaction);
+      await store.transfer(fromAccount.id, toAccount.id, request.amount);
+      const createdTransaction = await store.createTransaction(transaction);
+      if (!createdTransaction) {
+        throw new Error('Failed to create transaction');
+      }
+      return createdTransaction;
     } catch (error) {
-      throw new Error('Failed to create transaction');
+      throw error;
     }
   }
 }

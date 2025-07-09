@@ -23,10 +23,17 @@ class InMemoryStore {
     return this.accounts.get(id);
   }
 
-  async updateAccountBalance(id: string, balance: number): Promise<Account> {
-    const account = this.accounts.find((a) => a.id === id)!;
-    account.balance = balance;
-    return account;
+  async transfer(fromAccountId: string, toAccountId: string, amount: number) {
+    const fromAccount = this.accounts.get(fromAccountId);
+    if (!fromAccount) {
+      throw new Error('From account not found');
+    }
+    const toAccount = this.accounts.get(toAccountId);
+    if (!toAccount) {
+      throw new Error('To account not found');
+    }
+    fromAccount.balance -= amount;
+    toAccount.balance += amount;
   }
 
   async createTransaction(transaction: Transaction): Promise<Transaction> {

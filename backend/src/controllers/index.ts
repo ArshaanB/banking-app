@@ -116,7 +116,7 @@ export class AccountController {
   }
 
   // POST /api/accounts/transfer
-  static async transfer(req: Request, res: Response) {
+  static async transfer(req: Request<{}, any, TransferRequest>, res: Response) {
     const requestBody: TransferRequest = req.body;
     if (!requestBody.fromAccountId) {
       return res.status(400).json({ error: 'From account ID is required' });
@@ -127,16 +127,22 @@ export class AccountController {
     }
 
     if (!requestBody.amount || requestBody.amount <= 0) {
-      return res.status(400).json({ error: 'A valid amount is required' });
+      return res
+        .status(400)
+        .json({ error: 'A valid amount to transfer is required' });
     }
 
     try {
       const transaction = await AccountService.transfer(requestBody);
       return res.status(201).json(transaction);
     } catch (error) {
-      return res
-        .status(500)
-        .json({ error: '[Service] Failed to transfer funds' });
+      console.error(error);
+
+      if (error instanceof Error) {
+        return res.status(500).json({ error: error.message });
+      }
+
+      return res.status(500).json({ error: 'An unexpected error occurred' });
     }
   }
 }
