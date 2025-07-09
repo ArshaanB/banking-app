@@ -1,23 +1,17 @@
 import { Customer, Account, Transaction } from '../models';
 
 class InMemoryStore {
-  private customers: Customer[] = [];
+  private customers: Map<string, Customer> = new Map<string, Customer>();
   private accounts: Account[] = [];
   private transactions: Transaction[] = [];
 
-  constructor() {
-    this.customers = [];
-    this.accounts = [];
-    this.transactions = [];
-  }
-
   async createCustomer(customer: Customer): Promise<Customer> {
-    this.customers.push(customer);
+    this.customers.set(customer.id, customer);
     return customer;
   }
 
   async getCustomerById(id: string): Promise<Customer | undefined> {
-    return this.customers.find((customer) => customer.id === id);
+    return this.customers.get(id);
   }
 
   async createAccount(account: Account): Promise<Account> {
@@ -53,7 +47,7 @@ class InMemoryStore {
   }
 
   async clearAll() {
-    this.customers = [];
+    this.customers.clear();
     this.accounts = [];
     this.transactions = [];
   }

@@ -28,6 +28,10 @@ interface CreateCustomerRequest {
   name: string;
 }
 
+interface GetCustomerByIdRequest {
+  customerId: string;
+}
+
 interface CreateAccountRequest {
   customerId: string;
   balance: number;
@@ -44,6 +48,7 @@ export {
   Account,
   Transaction,
   CreateCustomerRequest,
+  GetCustomerByIdRequest,
   CreateAccountRequest,
   TransferRequest
 };

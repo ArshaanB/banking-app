@@ -10,7 +10,9 @@ import {
 } from '../models';
 
 export class CustomerService {
-  static createCustomer(request: CreateCustomerRequest): Promise<Customer> {
+  static async createCustomer(
+    request: CreateCustomerRequest
+  ): Promise<Customer> {
     const newCustomer = {
       ...request,
       id: randomUUID(),
@@ -18,23 +20,31 @@ export class CustomerService {
       updatedAt: new Date()
     };
     try {
-      return store.createCustomer(newCustomer);
+      const customer = await store.createCustomer(newCustomer);
+      if (!customer) {
+        throw new Error('Failed to create customer');
+      }
+      return customer;
     } catch (error) {
-      throw new Error('Failed to create customer');
+      throw error;
     }
   }
 
   static async getCustomerById(customerId: string): Promise<Customer> {
-    const customer = await store.getCustomerById(customerId);
-    if (!customer) {
-      throw new Error('Customer not found');
+    try {
+      const customer = await store.getCustomerById(customerId);
+      if (!customer) {
+        throw new Error('Customer not found');
+      }
+      return customer;
+    } catch (error) {
+      throw error;
     }
-    return customer;
   }
 }
 
 export class AccountService {
-  static createAccount(request: CreateAccountRequest): Promise<Account> {
+  static async createAccount(request: CreateAccountRequest): Promise<Account> {
     const customer = store.getCustomerById(request.customerId);
     if (!customer) {
       throw new Error('Customer not found');

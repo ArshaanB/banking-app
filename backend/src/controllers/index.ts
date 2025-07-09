@@ -2,13 +2,17 @@ import { Request, Response } from 'express';
 import { CustomerService, AccountService } from '../services';
 import {
   CreateCustomerRequest,
+  GetCustomerByIdRequest,
   CreateAccountRequest,
   TransferRequest
 } from '../models';
 
 export class CustomerController {
   // POST /api/customers
-  static async createCustomer(req: Request, res: Response) {
+  static async createCustomer(
+    req: Request<{}, any, CreateCustomerRequest>,
+    res: Response
+  ) {
     const requestBody: CreateCustomerRequest = req.body;
     if (!requestBody.name) {
       return res.status(400).json({ error: 'Name is required' });
@@ -29,17 +33,28 @@ export class CustomerController {
   }
 
   // GET /api/customers/:customerId
-  static async getCustomerById(req: Request, res: Response) {
-    const { customerId } = req.params;
-    if (!customerId) {
+  static async getCustomerById(
+    req: Request<GetCustomerByIdRequest>,
+    res: Response
+  ) {
+    const requestParams: GetCustomerByIdRequest = req.params;
+    if (!requestParams.customerId) {
       return res.status(400).json({ error: 'Customer ID is required' });
     }
 
     try {
-      const customer = await CustomerService.getCustomerById(customerId);
+      const customer = await CustomerService.getCustomerById(
+        requestParams.customerId
+      );
       return res.status(200).json(customer);
     } catch (error) {
-      return res.status(404).json({ error: 'Customer not found' });
+      console.error(error);
+
+      if (error instanceof Error) {
+        return res.status(500).json({ error: error.message });
+      }
+
+      return res.status(500).json({ error: 'An unexpected error occurred' });
     }
   }
 }
