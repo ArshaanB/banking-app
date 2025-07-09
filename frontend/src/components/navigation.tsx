@@ -1,19 +1,56 @@
-import Link from 'next/link';
+'use client';
 
-export default function Navigation() {
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { Home, Users, CreditCard, ArrowLeftRight } from 'lucide-react';
+import { cn } from '@/lib/utils';
+
+const navigationItems = [
+  {
+    name: 'Home',
+    href: '/',
+    icon: Home
+  },
+  {
+    name: 'Customers',
+    href: '/customers',
+    icon: Users
+  },
+  {
+    name: 'Accounts',
+    href: '/accounts',
+    icon: CreditCard
+  },
+  {
+    name: 'Transactions',
+    href: '/transactions',
+    icon: ArrowLeftRight
+  }
+];
+
+export function Navigation() {
+  const pathname = usePathname();
+
   return (
-    <div className="font-[family-name:var(--font-geist-sans)] py-10 px-20">
-      <main className="flex gap-[32px] row-start-2 items-center sm:items-start">
-        <Link href="/" className="hover:underline">
-          Home
-        </Link>
-        <Link href="/customers" className="hover:underline">
-          Customers
-        </Link>
-        <Link href="/accounts" className="hover:underline">
-          Accounts
-        </Link>
-      </main>
-    </div>
+    <nav className="flex items-center space-x-6 lg:space-x-8">
+      {navigationItems.map((item) => {
+        const Icon = item.icon;
+        return (
+          <Link
+            key={item.href}
+            href={item.href}
+            className={cn(
+              'flex items-center space-x-2 text-sm font-medium transition-colors hover:text-primary',
+              pathname === item.href
+                ? 'text-foreground'
+                : 'text-muted-foreground'
+            )}
+          >
+            <Icon className="h-4 w-4" />
+            <span>{item.name}</span>
+          </Link>
+        );
+      })}
+    </nav>
   );
 }
