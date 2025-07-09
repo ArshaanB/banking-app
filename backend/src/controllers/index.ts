@@ -1,11 +1,16 @@
 import { Request, Response } from 'express';
-import { CustomerService, AccountService } from '../services';
+import {
+  CustomerService,
+  AccountService,
+  TransactionService
+} from '../services';
 import {
   CreateCustomerRequest,
   GetCustomerByIdRequest,
   CreateAccountRequest,
   TransferRequest,
-  GetAccountByIdRequest
+  GetAccountByIdRequest,
+  GetTransactionsByAccountIdRequest
 } from '../models';
 
 export class CustomerController {
@@ -135,6 +140,34 @@ export class AccountController {
     try {
       const transaction = await AccountService.transfer(requestBody);
       return res.status(201).json(transaction);
+    } catch (error) {
+      console.error(error);
+
+      if (error instanceof Error) {
+        return res.status(500).json({ error: error.message });
+      }
+
+      return res.status(500).json({ error: 'An unexpected error occurred' });
+    }
+  }
+}
+
+export class TransactionController {
+  // GET /api/transactions/account/:accountId
+  static async getTransactionsByAccountId(
+    req: Request<GetTransactionsByAccountIdRequest>,
+    res: Response
+  ) {
+    const requestParams: GetTransactionsByAccountIdRequest = req.params;
+    if (!requestParams.accountId) {
+      return res.status(400).json({ error: 'Account ID is required' });
+    }
+
+    try {
+      const transactions = await TransactionService.getTransactionsByAccountId(
+        requestParams.accountId
+      );
+      return res.status(200).json(transactions);
     } catch (error) {
       console.error(error);
 

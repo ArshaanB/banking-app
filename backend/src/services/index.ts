@@ -120,3 +120,19 @@ export class AccountService {
     }
   }
 }
+
+export class TransactionService {
+  static async getTransactionsByAccountId(
+    accountId: string
+  ): Promise<Transaction[]> {
+    try {
+      const transactions = await store.getTransactionsByAccountId(accountId);
+      if (!transactions) {
+        throw new Error('No transactions found');
+      }
+      return transactions;
+    } catch (error) {
+      throw error;
+    }
+  }
+}

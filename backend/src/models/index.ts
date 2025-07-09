@@ -47,6 +47,10 @@ interface TransferRequest {
   amount: number;
 }
 
+interface GetTransactionsByAccountIdRequest {
+  accountId: string;
+}
+
 export {
   Customer,
   Account,
@@ -55,5 +59,6 @@ export {
   GetCustomerByIdRequest,
   CreateAccountRequest,
   GetAccountByIdRequest,
-  TransferRequest
+  TransferRequest,
+  GetTransactionsByAccountIdRequest
 };
