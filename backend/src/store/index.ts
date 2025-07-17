@@ -10,8 +10,8 @@ class InMemoryStore {
     return customer;
   }
 
-  async getCustomerById(id: string): Promise<Customer | undefined> {
-    return this.customers.get(id);
+  async getCustomerById(customerId: string): Promise<Customer | undefined> {
+    return this.customers.get(customerId);
   }
 
   async createAccount(account: Account): Promise<Account> {
@@ -19,19 +19,11 @@ class InMemoryStore {
     return account;
   }
 
-  async getAccountById(id: string): Promise<Account | undefined> {
-    return this.accounts.get(id);
+  async getAccountById(accountId: string): Promise<Account | undefined> {
+    return this.accounts.get(accountId);
   }
 
-  async transfer(fromAccountId: string, toAccountId: string, amount: number) {
-    const fromAccount = this.accounts.get(fromAccountId);
-    if (!fromAccount) {
-      throw new Error('From account not found');
-    }
-    const toAccount = this.accounts.get(toAccountId);
-    if (!toAccount) {
-      throw new Error('To account not found');
-    }
+  async transfer(fromAccount: Account, toAccount: Account, amount: number) {
     fromAccount.balance -= amount;
     toAccount.balance += amount;
   }

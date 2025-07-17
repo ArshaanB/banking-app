@@ -13,8 +13,8 @@ app.use(morgan('dev'));
 app.use(
   cors({
     origin: [
-      'http://localhost:3000', // Frontend development server
-      'http://127.0.0.1:3000' // Alternative localhost format
+      'http://localhost:3000', // frontend development server
+      'http://127.0.0.1:3000'
     ],
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
@@ -27,13 +27,6 @@ app.use(express.json());
 app.get('/', (req, res) => {
   res.json({
     message: 'Base App',
-    timestamp: new Date().toISOString()
-  });
-});
-
-app.get('/health', (req, res) => {
-  res.json({
-    message: 'health',
     timestamp: new Date().toISOString()
   });
 });

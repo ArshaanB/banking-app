@@ -49,9 +49,7 @@ export class CustomerController {
     }
 
     try {
-      const customer = await CustomerService.getCustomerById(
-        requestParams.customerId
-      );
+      const customer = await CustomerService.getCustomerById(requestParams);
       return res.status(200).json(customer);
     } catch (error) {
       console.error(error);
@@ -105,9 +103,7 @@ export class AccountController {
     }
 
     try {
-      const account = await AccountService.getAccountById(
-        requestParams.accountId
-      );
+      const account = await AccountService.getAccountById(requestParams);
       return res.status(200).json(account);
     } catch (error) {
       console.error(error);
@@ -165,7 +161,7 @@ export class TransactionController {
 
     try {
       const transactions = await TransactionService.getTransactionsByAccountId(
-        requestParams.accountId
+        requestParams
       );
       return res.status(200).json(transactions);
     } catch (error) {

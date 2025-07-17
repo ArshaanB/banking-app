@@ -21,6 +21,7 @@ interface Transaction {
   toAccountId: string;
   createdAt: Date;
   updatedAt: Date;
+  type: string;
 }
 
 // Requests

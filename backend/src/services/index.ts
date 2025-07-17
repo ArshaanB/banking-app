@@ -6,7 +6,10 @@ import {
   Transaction,
   CreateCustomerRequest,
   CreateAccountRequest,
-  TransferRequest
+  TransferRequest,
+  GetCustomerByIdRequest,
+  GetAccountByIdRequest,
+  GetTransactionsByAccountIdRequest
 } from '../models';
 
 export class CustomerService {
@@ -30,9 +33,11 @@ export class CustomerService {
     }
   }
 
-  static async getCustomerById(customerId: string): Promise<Customer> {
+  static async getCustomerById(
+    request: GetCustomerByIdRequest
+  ): Promise<Customer> {
     try {
-      const customer = await store.getCustomerById(customerId);
+      const customer = await store.getCustomerById(request.customerId);
       if (!customer) {
         throw new Error('Customer not found');
       }
@@ -45,21 +50,21 @@ export class CustomerService {
 
 export class AccountService {
   static async createAccount(request: CreateAccountRequest): Promise<Account> {
-    const customer = store.getCustomerById(request.customerId);
-    if (!customer) {
-      throw new Error('Customer not found');
-    }
-    if (request.balance <= 0) {
-      throw new Error('Initial balance must be greater than 0');
-    }
-
-    const newAccount = {
-      ...request,
-      id: randomUUID(),
-      createdAt: new Date(),
-      updatedAt: new Date()
-    };
     try {
+      const customer = store.getCustomerById(request.customerId);
+      if (!customer) {
+        throw new Error('Customer not found');
+      }
+      if (request.balance <= 0) {
+        throw new Error('Initial balance must be greater than 0');
+      }
+
+      const newAccount = {
+        ...request,
+        id: randomUUID(),
+        createdAt: new Date(),
+        updatedAt: new Date()
+      };
       const account = await store.createAccount(newAccount);
       if (!account) {
         throw new Error('Failed to create account');
@@ -70,9 +75,11 @@ export class AccountService {
     }
   }
 
-  static async getAccountById(accountId: string): Promise<Account> {
+  static async getAccountById(
+    request: GetAccountByIdRequest
+  ): Promise<Account> {
     try {
-      const account = await store.getAccountById(accountId);
+      const account = await store.getAccountById(request.accountId);
       if (!account) {
         throw new Error('Account not found');
       }
@@ -83,33 +90,34 @@ export class AccountService {
   }
 
   static async transfer(request: TransferRequest): Promise<Transaction> {
-    const fromAccount = await store.getAccountById(request.fromAccountId);
-    if (!fromAccount) {
-      throw new Error('From account not found');
-    }
-
-    const toAccount = await store.getAccountById(request.toAccountId);
-    if (!toAccount) {
-      throw new Error('To account not found');
-    }
-
-    if (fromAccount.id === toAccount.id) {
-      throw new Error('Cannot transfer to the same account');
-    }
-
-    if (fromAccount.balance < request.amount) {
-      throw new Error('Insufficient funds to transfer');
-    }
-
-    const transaction = {
-      ...request,
-      id: randomUUID(),
-      createdAt: new Date(),
-      updatedAt: new Date()
-    };
-
     try {
-      await store.transfer(fromAccount.id, toAccount.id, request.amount);
+      const fromAccount = await store.getAccountById(request.fromAccountId);
+      if (!fromAccount) {
+        throw new Error('From account not found');
+      }
+
+      const toAccount = await store.getAccountById(request.toAccountId);
+      if (!toAccount) {
+        throw new Error('To account not found');
+      }
+
+      if (fromAccount.id === toAccount.id) {
+        throw new Error('Cannot transfer to the same account');
+      }
+
+      if (fromAccount.balance < request.amount) {
+        throw new Error('Insufficient funds to transfer');
+      }
+
+      const transaction = {
+        ...request,
+        id: randomUUID(),
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        type: 'transfer'
+      };
+
+      await store.transfer(fromAccount, toAccount, request.amount);
       const createdTransaction = await store.createTransaction(transaction);
       if (!createdTransaction) {
         throw new Error('Failed to create transaction');
@@ -123,13 +131,12 @@ export class AccountService {
 
 export class TransactionService {
   static async getTransactionsByAccountId(
-    accountId: string
+    request: GetTransactionsByAccountIdRequest
   ): Promise<Transaction[]> {
     try {
-      const transactions = await store.getTransactionsByAccountId(accountId);
-      if (!transactions) {
-        throw new Error('No transactions found');
-      }
+      const transactions = await store.getTransactionsByAccountId(
+        request.accountId
+      );
       return transactions;
     } catch (error) {
       throw error;
