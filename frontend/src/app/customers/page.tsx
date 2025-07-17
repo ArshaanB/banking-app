@@ -36,14 +36,14 @@ export default function Customers() {
 
   const {
     data: customer,
-    isPending: isSearchCustomerPending,
     isSuccess: isSearchCustomerSuccess,
     isError: isSearchCustomerError,
+    isRefetching: isSearchCustomerRefetching,
     refetch: searchCustomer
   } = useQuery({
     queryKey: ['customer', customerId],
     queryFn: () => apiClient.getCustomerById(customerId),
-    enabled: false // Disable automatic execution
+    enabled: false
   });
 
   const handleCreateCustomer = (e: React.FormEvent<HTMLFormElement>) => {
@@ -170,9 +170,9 @@ export default function Customers() {
                   <Button
                     type="submit"
                     className="w-full"
-                    disabled={isSearchCustomerPending || !customerId.trim()}
+                    disabled={!customerId.trim()}
                   >
-                    {isSearchCustomerPending && customerId.trim()
+                    {isSearchCustomerRefetching
                       ? 'Searching...'
                       : 'Search Customer'}
                   </Button>
@@ -205,7 +205,20 @@ export default function Customers() {
                     </div> */}
                     <div className="flex justify-between items-center p-3 bg-muted/50 rounded-lg">
                       <span className="font-medium text-sm">Created:</span>
-                      <span className="text-sm">{customer?.createdAt}</span>
+                      <span className="text-sm">
+                        {customer?.createdAt
+                          ? new Date(customer.createdAt).toLocaleDateString(
+                              'en-US',
+                              {
+                                year: 'numeric',
+                                month: 'long',
+                                day: 'numeric',
+                                hour: '2-digit',
+                                minute: '2-digit'
+                              }
+                            )
+                          : 'N/A'}
+                      </span>
                     </div>
                     {/* <div className="flex justify-between items-center p-3 bg-muted/50 rounded-lg">
                       <span className="font-medium text-sm">Status:</span>
