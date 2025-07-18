@@ -9,6 +9,16 @@ export interface Customer {
   updatedAt: string;
 }
 
+export interface Account {
+  id: string;
+  customerId: string;
+  balance: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type Entity = Customer | Account;
+
 // API Request Types
 export interface CreateCustomerRequest {
   name: string;

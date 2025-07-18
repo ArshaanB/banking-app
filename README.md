@@ -9,9 +9,7 @@ banking-app/
 ├── backend/           # Express.js API server
 │   ├── src/
 │   │   └── index.ts   # Main server entry point
-│   ├── package.json
-│   └── tsconfig.json
-├── frontend/          # Frontend application
+├── frontend/          # Frontend Next.js Application
 └── README.md
 ```
 
@@ -19,10 +17,12 @@ banking-app/
 
 ### Prerequisites
 
-- Node.js (v18 or higher)
+- Node.js (v20 or higher)
 - npm or yarn
 
-### Backend Setup
+### Frontend / Backend Setup
+
+Perform the same steps below for the frontend, but replace any mention of `backend` with `frontend`.
 
 1. Navigate to the backend directory:
 
@@ -45,20 +45,21 @@ banking-app/
 4. Start the server:
 
    ```bash
-   npm start
+   npm run start
    ```
 
-   The API server will run on `http://localhost:3001`
+   The Backend (API server) will run on `http://localhost:3001`. Frontend will run on `http://localhost:3000`.
 
-### Development
+### Testing
 
-- **Run tests:** `npm test` (in backend directory)
-- **Build:** `npm run build` (in backend directory)
+1. Backend Tests
+
+- `npm test` (in /backend directory)
 
 ### API Endpoints
 
-- `GET /` - Base endpoint with timestamp
-- `GET /health` - Health check endpoint
+- `GET /` - base endpoint with timestamp
+- TODO: List other endpoints.
 
 ## Environment Variables
 

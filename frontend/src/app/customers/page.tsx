@@ -2,8 +2,8 @@
 
 import type React from 'react';
 import { useState } from 'react';
-import { useMutation, useQuery } from '@tanstack/react-query';
-import { apiClient, Customer } from '@/lib/api';
+import { useQuery } from '@tanstack/react-query';
+import { apiClient } from '@/lib/api';
 
 import {
   Card,
@@ -16,23 +16,14 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Users, Search, Plus, CheckCircle, XCircle, User } from 'lucide-react';
+import { Users, Search, XCircle, User } from 'lucide-react';
+import CreateNewEntity from '@/components/create-new-entity';
 
 export default function Customers() {
-  const [customerName, setCustomerName] = useState('');
-  const [createdCustomer, setCreatedCustomer] = useState<Customer | null>(null);
   const [customerId, setCustomerId] = useState('');
 
-  const {
-    mutate: createCustomer,
-    isPending: isCreateCustomerPending,
-    isSuccess: isCreateCustomerSuccess
-  } = useMutation({
-    mutationFn: (name: string) => apiClient.createCustomer({ name }),
-    onSuccess: (data) => {
-      setCreatedCustomer(data);
-    }
-  });
+  const createCustomerMutationFn = (name: string) =>
+    apiClient.createCustomer({ name });
 
   const {
     data: customer,
@@ -45,11 +36,6 @@ export default function Customers() {
     queryFn: () => apiClient.getCustomerById(customerId),
     enabled: false
   });
-
-  const handleCreateCustomer = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    createCustomer(customerName);
-  };
 
   const handleSearchCustomer = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -80,70 +66,10 @@ export default function Customers() {
         {/* Two Column Layout */}
         <div className="grid gap-8 lg:grid-cols-2">
           {/* Left Column - Create Customer */}
-          <div className="space-y-4">
-            <Card>
-              <CardHeader>
-                <div className="flex items-center space-x-2">
-                  <Plus className="h-5 w-5 text-green-600" />
-                  <CardTitle>Create New Customer</CardTitle>
-                </div>
-                <CardDescription>
-                  Add a new customer to your database
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <form onSubmit={handleCreateCustomer} className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="customerName">Customer Name</Label>
-                    <Input
-                      id="customerName"
-                      type="text"
-                      placeholder="Enter customer name"
-                      value={customerName}
-                      onChange={(e) => setCustomerName(e.target.value)}
-                      required
-                    />
-                  </div>
-                  <Button
-                    type="submit"
-                    className="w-full"
-                    disabled={isCreateCustomerPending || !customerName.trim()}
-                  >
-                    {isCreateCustomerPending
-                      ? 'Creating...'
-                      : 'Create Customer'}
-                  </Button>
-                </form>
-              </CardContent>
-            </Card>
-
-            {/* Success/Error Banner */}
-            {isCreateCustomerSuccess && (
-              <Alert
-                className={
-                  isCreateCustomerSuccess
-                    ? 'border-green-200 bg-green-50'
-                    : 'border-red-200 bg-red-50'
-                }
-              >
-                {isCreateCustomerSuccess ? (
-                  <CheckCircle className="h-4 w-4 text-green-600" />
-                ) : (
-                  <XCircle className="h-4 w-4 text-red-600" />
-                )}
-                <AlertDescription
-                  className={
-                    isCreateCustomerSuccess ? 'text-green-800' : 'text-red-800'
-                  }
-                >
-                  {isCreateCustomerSuccess
-                    ? `Customer created successfully with ID: ${createdCustomer?.id}`
-                    : 'Failed to create customer'}
-                </AlertDescription>
-              </Alert>
-            )}
-          </div>
-
+          <CreateNewEntity
+            mutationFn={createCustomerMutationFn}
+            entityTitle="Customer"
+          />
           {/* Right Column - Search Customer */}
           <div className="space-y-6">
             <Card>
@@ -199,10 +125,6 @@ export default function Customers() {
                       <span className="font-medium text-sm">Name:</span>
                       <span className="text-sm">{customer?.name}</span>
                     </div>
-                    {/* <div className="flex justify-between items-center p-3 bg-muted/50 rounded-lg">
-                      <span className="font-medium text-sm">Email:</span>
-                      <span className="text-sm">{customer?.email}</span>
-                    </div> */}
                     <div className="flex justify-between items-center p-3 bg-muted/50 rounded-lg">
                       <span className="font-medium text-sm">Created:</span>
                       <span className="text-sm">
@@ -220,18 +142,6 @@ export default function Customers() {
                           : 'N/A'}
                       </span>
                     </div>
-                    {/* <div className="flex justify-between items-center p-3 bg-muted/50 rounded-lg">
-                      <span className="font-medium text-sm">Status:</span>
-                      <span
-                        className={`text-sm px-2 py-1 rounded-full text-xs font-medium ${
-                          isSearchCustomerSuccess
-                            ? 'bg-green-100 text-green-800'
-                            : 'bg-gray-100 text-gray-800'
-                        }`}
-                      >
-                        {isSearchCustomerSuccess}
-                      </span>
-                    </div> */}
                   </div>
                 </CardContent>
               </Card>
