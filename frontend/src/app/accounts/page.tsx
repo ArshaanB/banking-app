@@ -19,28 +19,30 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Users, Search, XCircle, User } from 'lucide-react';
 import CreateNewEntity from '@/components/create-new-entity';
 
-export default function Customers() {
-  const [customerId, setCustomerId] = useState('');
+export default function Accounts() {
+  const [accountId, setAccountId] = useState('');
 
-  const createCustomerMutationFn = (args: { name: string }) =>
-    apiClient.createCustomer(args);
+  const createAccountMutationFn = (args: {
+    customerId: string;
+    balance: number;
+  }) => apiClient.createAccount(args);
 
   const {
-    data: customer,
-    isSuccess: isSearchCustomerSuccess,
-    isError: isSearchCustomerError,
-    isRefetching: isSearchCustomerRefetching,
-    refetch: searchCustomer
+    data: account,
+    isSuccess: isSearchAccountSuccess,
+    isError: isSearchAccountError,
+    isRefetching: isSearchAccountRefetching,
+    refetch: searchAccount
   } = useQuery({
-    queryKey: ['customer', customerId],
-    queryFn: () => apiClient.getCustomerById(customerId),
+    queryKey: ['account', accountId],
+    queryFn: () => apiClient.getAccountById(accountId),
     enabled: false
   });
 
-  const handleSearchCustomer = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSearchAccount = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (customerId.trim()) {
-      searchCustomer();
+    if (accountId.trim()) {
+      searchAccount();
     }
   };
 
@@ -65,25 +67,41 @@ export default function Customers() {
 
         {/* Two Column Layout */}
         <div className="grid gap-8 lg:grid-cols-2">
-          {/* Left Column - Create Customer */}
+          {/* Left Column - Create Account */}
           <CreateNewEntity
-            mutationFn={createCustomerMutationFn}
-            entityTitle="Customer"
-            initialState={{ name: '' }}
+            mutationFn={createAccountMutationFn}
+            entityTitle="Account"
+            initialState={{ customerId: '', balance: 0 }}
           >
             {(args, setArgs, isPending) => (
               <>
                 <div className="space-y-2">
-                  <Label htmlFor="customerName">Customer Name</Label>
+                  <Label htmlFor="customerId">Customer ID</Label>
                   <Input
-                    id="customerName"
+                    id="customerId"
                     type="text"
-                    placeholder="Enter customer name"
-                    value={args.name}
+                    placeholder="Enter customer ID"
+                    value={args.customerId}
                     onChange={(e) =>
                       setArgs((prev) => ({
                         ...prev,
-                        name: e.target.value
+                        customerId: e.target.value
+                      }))
+                    }
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="balance">Balance</Label>
+                  <Input
+                    id="balance"
+                    type="number"
+                    placeholder="Enter balance"
+                    value={args.balance}
+                    onChange={(e) =>
+                      setArgs((prev) => ({
+                        ...prev,
+                        balance: parseFloat(e.target.value)
                       }))
                     }
                     required
@@ -92,73 +110,79 @@ export default function Customers() {
                 <Button
                   type="submit"
                   className="w-full"
-                  disabled={isPending || !args.name.trim()}
+                  disabled={
+                    isPending || !args.customerId.trim() || !args.balance
+                  }
                 >
-                  {isPending ? 'Creating...' : 'Create Customer'}
+                  {isPending ? 'Creating...' : 'Create Account'}
                 </Button>
               </>
             )}
           </CreateNewEntity>
-          {/* Right Column - Search Customer */}
+          {/* Right Column - Search Account */}
           <div className="space-y-6">
             <Card>
               <CardHeader>
                 <div className="flex items-center space-x-2">
                   <Search className="h-5 w-5 text-blue-600" />
-                  <CardTitle>Search Customer</CardTitle>
+                  <CardTitle>Search Account</CardTitle>
                 </div>
-                <CardDescription>Find a customer by their ID</CardDescription>
+                <CardDescription>Find an account by their ID</CardDescription>
               </CardHeader>
               <CardContent>
-                <form onSubmit={handleSearchCustomer} className="space-y-4">
+                <form onSubmit={handleSearchAccount} className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="customerId">Customer ID</Label>
+                    <Label htmlFor="accountId">Account ID</Label>
                     <Input
-                      id="customerId"
+                      id="accountId"
                       type="text"
-                      placeholder="Enter customer ID"
-                      value={customerId}
-                      onChange={(e) => setCustomerId(e.target.value)}
+                      placeholder="Enter account ID"
+                      value={accountId}
+                      onChange={(e) => setAccountId(e.target.value)}
                       required
                     />
                   </div>
                   <Button
                     type="submit"
                     className="w-full"
-                    disabled={!customerId.trim()}
+                    disabled={!accountId.trim()}
                   >
-                    {isSearchCustomerRefetching
+                    {isSearchAccountRefetching
                       ? 'Searching...'
-                      : 'Search Customer'}
+                      : 'Search Account'}
                   </Button>
                 </form>
               </CardContent>
             </Card>
 
             {/* Search Results */}
-            {isSearchCustomerSuccess && (
+            {isSearchAccountSuccess && (
               <Card>
                 <CardHeader>
                   <div className="flex items-center space-x-2">
                     <User className="h-5 w-5 text-green-600" />
-                    <CardTitle>Customer Found</CardTitle>
+                    <CardTitle>Account Found</CardTitle>
                   </div>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="grid gap-3">
                     <div className="flex justify-between items-center p-3 bg-muted/50 rounded-lg">
-                      <span className="font-medium text-sm">Customer ID:</span>
-                      <span className="text-sm">{customer?.id}</span>
+                      <span className="font-medium text-sm">Account ID:</span>
+                      <span className="text-sm">{account?.id}</span>
                     </div>
                     <div className="flex justify-between items-center p-3 bg-muted/50 rounded-lg">
-                      <span className="font-medium text-sm">Name:</span>
-                      <span className="text-sm">{customer?.name}</span>
+                      <span className="font-medium text-sm">Customer ID:</span>
+                      <span className="text-sm">{account?.customerId}</span>
+                    </div>
+                    <div className="flex justify-between items-center p-3 bg-muted/50 rounded-lg">
+                      <span className="font-medium text-sm">Balance:</span>
+                      <span className="text-sm">{account?.balance}</span>
                     </div>
                     <div className="flex justify-between items-center p-3 bg-muted/50 rounded-lg">
                       <span className="font-medium text-sm">Created:</span>
                       <span className="text-sm">
-                        {customer?.createdAt
-                          ? new Date(customer.createdAt).toLocaleDateString(
+                        {account?.createdAt
+                          ? new Date(account.createdAt).toLocaleDateString(
                               'en-US',
                               {
                                 year: 'numeric',
@@ -177,11 +201,11 @@ export default function Customers() {
             )}
 
             {/* Search Error */}
-            {isSearchCustomerError && (
+            {isSearchAccountError && (
               <Alert className="border-red-200 bg-red-50">
                 <XCircle className="h-4 w-4 text-red-600" />
                 <AlertDescription className="text-red-800">
-                  {`No customer found with ID: ${customerId}`}
+                  {`No account found with ID: ${accountId}`}
                 </AlertDescription>
               </Alert>
             )}

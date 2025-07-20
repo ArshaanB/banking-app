@@ -10,34 +10,42 @@ import {
   CardTitle
 } from '@/components/ui/card';
 
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Plus, CheckCircle, XCircle } from 'lucide-react';
-import { useState } from 'react';
+import { ReactNode, useState } from 'react';
 import { Entity } from '@/lib/api';
 
-export default function CreateNewEntity({
+type ArgsObject = { [key: string]: string | number };
+
+export default function CreateNewEntity<T extends ArgsObject>({
   mutationFn,
-  entityTitle
+  entityTitle,
+  children,
+  initialState
 }: {
-  mutationFn: (name: string) => Promise<Entity>;
+  mutationFn: (args: T) => Promise<Entity>;
   entityTitle: string;
+  children: (
+    args: T,
+    setArgs: React.Dispatch<React.SetStateAction<T>>,
+    isPending: boolean
+  ) => ReactNode;
+  initialState: T;
 }) {
-  const [entityName, setEntityName] = useState('');
+  const [argsForEntity, setArgsForEntity] = useState<T>(initialState);
   const [createdEntity, setCreatedEntity] = useState<Entity | null>(null);
 
-  const { mutate, isPending, isSuccess } = useMutation({
+  const { mutate, isPending, isSuccess, isError } = useMutation({
     mutationFn: mutationFn,
     onSuccess: (data) => {
       setCreatedEntity(data);
+      setArgsForEntity(initialState);
     }
   });
 
   const handleCreateEntity = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    mutate(entityName);
+    mutate(argsForEntity);
   };
 
   return (
@@ -54,30 +62,13 @@ export default function CreateNewEntity({
         </CardHeader>
         <CardContent>
           <form onSubmit={handleCreateEntity} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="entityName">{entityTitle} Name</Label>
-              <Input
-                id="entityName"
-                type="text"
-                placeholder={`Enter ${entityTitle.toLowerCase()} name`}
-                value={entityName}
-                onChange={(e) => setEntityName(e.target.value)}
-                required
-              />
-            </div>
-            <Button
-              type="submit"
-              className="w-full"
-              disabled={isPending || !entityName.trim()}
-            >
-              {isPending ? 'Creating...' : `Create ${entityTitle}`}
-            </Button>
+            {children(argsForEntity, setArgsForEntity, isPending)}
           </form>
         </CardContent>
       </Card>
 
       {/* Success/Error Banner */}
-      {isSuccess && (
+      {(isSuccess || isError) && (
         <Alert
           className={
             isSuccess

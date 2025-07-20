@@ -24,6 +24,11 @@ export interface CreateCustomerRequest {
   name: string;
 }
 
+export interface CreateAccountRequest {
+  customerId: string;
+  balance: number;
+}
+
 // API Response Types
 export interface AccountBalanceResponse {
   accountId: string;
@@ -68,6 +73,17 @@ class ApiClient {
 
   async getCustomerById(customerId: string): Promise<Customer> {
     return this.request<Customer>(`/api/customers/${customerId}`);
+  }
+
+  async createAccount(data: CreateAccountRequest): Promise<Account> {
+    return this.request<Account>('/api/accounts', {
+      method: 'POST',
+      body: JSON.stringify(data)
+    });
+  }
+
+  async getAccountById(accountId: string): Promise<Account> {
+    return this.request<Account>(`/api/accounts/${accountId}`);
   }
 
   async getAccountBalance(accountId: string): Promise<AccountBalanceResponse> {
