@@ -40,7 +40,7 @@ export interface TransferMoneyRequest {
   amount: number;
 }
 
-interface Transaction {
+export interface Transaction {
   id: string;
   amount: number;
   fromAccountId: string;
@@ -106,6 +106,16 @@ class ApiClient {
       method: 'POST',
       body: JSON.stringify(data)
     });
+  }
+
+  async getTransactions(
+    accountId: string,
+    page: number,
+    limit: number
+  ): Promise<{ transactions: Transaction[]; hasMore: boolean }> {
+    return this.request<{ transactions: Transaction[]; hasMore: boolean }>(
+      `/api/transactions/account/${accountId}?page=${page}&limit=${limit}`
+    );
   }
 }
 
