@@ -13,6 +13,19 @@ import {
   GetTransactionsByAccountIdRequest
 } from '../models';
 
+/**
+ * Error handler for all controllers for consistent error responses and logging.
+ */
+function handleControllerError(error: unknown, res: Response): Response {
+  console.error(error);
+
+  if (error instanceof Error) {
+    return res.status(500).json({ error: error.message });
+  }
+
+  return res.status(500).json({ error: 'An unexpected error occurred' });
+}
+
 export class CustomerController {
   // POST /api/customers
   static async createCustomer(
@@ -28,13 +41,7 @@ export class CustomerController {
       const customer = await CustomerService.createCustomer(requestBody);
       return res.status(201).json(customer);
     } catch (error) {
-      console.error(error);
-
-      if (error instanceof Error) {
-        return res.status(500).json({ error: error.message });
-      }
-
-      return res.status(500).json({ error: 'An unexpected error occurred' });
+      return handleControllerError(error, res);
     }
   }
 
@@ -52,13 +59,7 @@ export class CustomerController {
       const customer = await CustomerService.getCustomerById(requestParams);
       return res.status(200).json(customer);
     } catch (error) {
-      console.error(error);
-
-      if (error instanceof Error) {
-        return res.status(500).json({ error: error.message });
-      }
-
-      return res.status(500).json({ error: 'An unexpected error occurred' });
+      return handleControllerError(error, res);
     }
   }
 }
@@ -82,13 +83,7 @@ export class AccountController {
       const account = await AccountService.createAccount(requestBody);
       return res.status(201).json(account);
     } catch (error) {
-      console.error(error);
-
-      if (error instanceof Error) {
-        return res.status(500).json({ error: error.message });
-      }
-
-      return res.status(500).json({ error: 'An unexpected error occurred' });
+      return handleControllerError(error, res);
     }
   }
 
@@ -106,13 +101,7 @@ export class AccountController {
       const account = await AccountService.getAccountById(requestParams);
       return res.status(200).json(account);
     } catch (error) {
-      console.error(error);
-
-      if (error instanceof Error) {
-        return res.status(500).json({ error: error.message });
-      }
-
-      return res.status(500).json({ error: 'An unexpected error occurred' });
+      return handleControllerError(error, res);
     }
   }
 
@@ -137,13 +126,7 @@ export class AccountController {
       const transaction = await AccountService.transfer(requestBody);
       return res.status(201).json(transaction);
     } catch (error) {
-      console.error(error);
-
-      if (error instanceof Error) {
-        return res.status(500).json({ error: error.message });
-      }
-
-      return res.status(500).json({ error: 'An unexpected error occurred' });
+      return handleControllerError(error, res);
     }
   }
 }
@@ -171,13 +154,7 @@ export class TransactionController {
         );
       return res.status(200).json({ transactions, hasMore });
     } catch (error) {
-      console.error(error);
-
-      if (error instanceof Error) {
-        return res.status(500).json({ error: error.message });
-      }
-
-      return res.status(500).json({ error: 'An unexpected error occurred' });
+      return handleControllerError(error, res);
     }
   }
 }
