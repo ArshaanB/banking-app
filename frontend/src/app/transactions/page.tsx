@@ -75,6 +75,10 @@ export default function TransactionsPage() {
     }
   };
 
+  const shortenAccountId = (accountId: string) => {
+    return accountId.slice(0, 4) + '...' + accountId.slice(-4);
+  };
+
   return (
     <div className="min-h-screen bg-background">
       {/* Main Content */}
@@ -160,6 +164,8 @@ export default function TransactionsPage() {
                     <TableRow>
                       <TableHead>Transaction ID</TableHead>
                       <TableHead>Transaction Date</TableHead>
+                      <TableHead>From</TableHead>
+                      <TableHead>To</TableHead>
                       <TableHead>Type</TableHead>
                       <TableHead className="text-right">Amount</TableHead>
                     </TableRow>
@@ -172,6 +178,12 @@ export default function TransactionsPage() {
                         </TableCell>
                         <TableCell className="text-sm">
                           {formatDate(transaction.createdAt)}
+                        </TableCell>
+                        <TableCell>
+                          {shortenAccountId(transaction.fromAccountId)}
+                        </TableCell>
+                        <TableCell>
+                          {shortenAccountId(transaction.toAccountId)}
                         </TableCell>
                         <TableCell>{transaction.type.toUpperCase()}</TableCell>
                         <TableCell className="text-right font-medium">
