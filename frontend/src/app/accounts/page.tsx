@@ -324,22 +324,20 @@ export default function Accounts() {
                     : 'border-red-200 bg-red-50'
                 }
               >
-                <div className="flex items-center space-x-2">
-                  {isTransferSuccess ? (
-                    <CheckCircle className="h-4 w-4 text-green-600" />
-                  ) : (
-                    <XCircle className="h-4 w-4 text-red-600" />
-                  )}
-                  <AlertDescription
-                    className={
-                      isTransferSuccess ? 'text-green-800' : 'text-red-800'
-                    }
-                  >
-                    {isTransferSuccess
-                      ? `Transfer successful with ID: ${transferResult?.id}`
-                      : `Transfer failed: ${transferError?.message}`}
-                  </AlertDescription>
-                </div>
+                {isTransferSuccess ? (
+                  <CheckCircle className="h-4 w-4 text-green-600" />
+                ) : (
+                  <XCircle className="h-4 w-4 text-red-600" />
+                )}
+                <AlertDescription
+                  className={
+                    isTransferSuccess ? 'text-green-800' : 'text-red-800'
+                  }
+                >
+                  {isTransferSuccess
+                    ? `Transfer successful with transaction ID: ${transferResult?.id}`
+                    : `Transfer failed: ${transferError?.message}`}
+                </AlertDescription>
               </Alert>
             )}
           </div>
