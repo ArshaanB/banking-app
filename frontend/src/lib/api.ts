@@ -34,6 +34,21 @@ export interface AccountBalanceResponse {
   accountId: string;
   balance: number;
 }
+export interface TransferMoneyRequest {
+  fromAccountId: string;
+  toAccountId: string;
+  amount: number;
+}
+
+interface Transaction {
+  id: string;
+  amount: number;
+  fromAccountId: string;
+  toAccountId: string;
+  createdAt: Date;
+  updatedAt: Date;
+  type: string;
+}
 
 class ApiClient {
   private baseUrl: string;
@@ -84,6 +99,13 @@ class ApiClient {
 
   async getAccountById(accountId: string): Promise<Account> {
     return this.request<Account>(`/api/accounts/${accountId}`);
+  }
+
+  async transferMoney(data: TransferMoneyRequest): Promise<Transaction> {
+    return this.request<Transaction>('/api/accounts/transfer', {
+      method: 'POST',
+      body: JSON.stringify(data)
+    });
   }
 
   async getAccountBalance(accountId: string): Promise<AccountBalanceResponse> {

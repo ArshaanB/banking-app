@@ -2,7 +2,7 @@
 
 import type React from 'react';
 import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { apiClient } from '@/lib/api';
 
 import {
@@ -16,11 +16,21 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Users, Search, XCircle, User } from 'lucide-react';
+import {
+  Users,
+  Search,
+  XCircle,
+  User,
+  ArrowUpDown,
+  CheckCircle
+} from 'lucide-react';
 import CreateNewEntity from '@/components/create-new-entity';
 
 export default function Accounts() {
   const [accountId, setAccountId] = useState('');
+  const [fromAccountId, setFromAccountId] = useState('');
+  const [toAccountId, setToAccountId] = useState('');
+  const [transferAmount, setTransferAmount] = useState('');
 
   const createAccountMutationFn = (args: {
     customerId: string;
@@ -39,10 +49,36 @@ export default function Accounts() {
     enabled: false
   });
 
+  const {
+    mutate: transferMoney,
+    isPending: isTransferring,
+    isSuccess: isTransferSuccess,
+    isError: isTransferError,
+    data: transferResult,
+    error: transferError
+  } = useMutation({
+    mutationFn: (args: {
+      fromAccountId: string;
+      toAccountId: string;
+      amount: number;
+    }) => apiClient.transferMoney(args)
+  });
+
   const handleSearchAccount = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (accountId.trim()) {
       searchAccount();
+    }
+  };
+
+  const handleTransferMoney = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (fromAccountId.trim() && toAccountId.trim() && transferAmount.trim()) {
+      transferMoney({
+        fromAccountId,
+        toAccountId,
+        amount: parseFloat(transferAmount)
+      });
     }
   };
 
@@ -207,6 +243,103 @@ export default function Accounts() {
                 <AlertDescription className="text-red-800">
                   {`No account found with ID: ${accountId}`}
                 </AlertDescription>
+              </Alert>
+            )}
+          </div>
+        </div>
+        <div className="grid gap-8 lg:grid-cols-2 mt-8">
+          <div className="space-y-6">
+            {/* Transfer Money Card */}
+            <Card>
+              <CardHeader>
+                <div className="flex items-center space-x-2">
+                  <ArrowUpDown className="h-5 w-5 text-purple-600" />
+                  <CardTitle>Transfer Money</CardTitle>
+                </div>
+                <CardDescription>
+                  Transfer funds between accounts
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <form onSubmit={handleTransferMoney} className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="fromAccountId">From Account ID</Label>
+                    <Input
+                      id="fromAccountId"
+                      type="text"
+                      placeholder="Enter source account ID"
+                      value={fromAccountId}
+                      onChange={(e) => setFromAccountId(e.target.value)}
+                      required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="toAccountId">To Account ID</Label>
+                    <Input
+                      id="toAccountId"
+                      type="text"
+                      placeholder="Enter destination account ID"
+                      value={toAccountId}
+                      onChange={(e) => setToAccountId(e.target.value)}
+                      required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="transferAmount">Transfer Amount</Label>
+                    <Input
+                      id="transferAmount"
+                      type="number"
+                      step="0.01"
+                      min="0.01"
+                      placeholder="0.00"
+                      value={transferAmount}
+                      onChange={(e) => setTransferAmount(e.target.value)}
+                      required
+                    />
+                  </div>
+                  <Button
+                    type="submit"
+                    className="w-full"
+                    disabled={
+                      isTransferring ||
+                      !fromAccountId.trim() ||
+                      !toAccountId.trim() ||
+                      !transferAmount.trim()
+                    }
+                  >
+                    {isTransferring
+                      ? 'Processing Transfer...'
+                      : 'Transfer Money'}
+                  </Button>
+                </form>
+              </CardContent>
+            </Card>
+
+            {/* Transfer Result Banner */}
+            {(isTransferSuccess || isTransferError) && (
+              <Alert
+                className={
+                  isTransferSuccess
+                    ? 'border-green-200 bg-green-50'
+                    : 'border-red-200 bg-red-50'
+                }
+              >
+                <div className="flex items-center space-x-2">
+                  {isTransferSuccess ? (
+                    <CheckCircle className="h-4 w-4 text-green-600" />
+                  ) : (
+                    <XCircle className="h-4 w-4 text-red-600" />
+                  )}
+                  <AlertDescription
+                    className={
+                      isTransferSuccess ? 'text-green-800' : 'text-red-800'
+                    }
+                  >
+                    {isTransferSuccess
+                      ? `Transfer successful with ID: ${transferResult?.id}`
+                      : `Transfer failed: ${transferError?.message}`}
+                  </AlertDescription>
+                </div>
               </Alert>
             )}
           </div>
