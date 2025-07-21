@@ -57,9 +57,9 @@ export default function Accounts() {
               <Users className="h-6 w-6 text-blue-600" />
             </div>
             <div>
-              <h2 className="text-3xl font-bold tracking-tight">Customers</h2>
+              <h2 className="text-3xl font-bold tracking-tight">Accounts</h2>
               <p className="text-muted-foreground mt-1">
-                Create new customers and search existing ones
+                Create new accounts and search existing ones
               </p>
             </div>
           </div>
