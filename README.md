@@ -58,8 +58,20 @@ Perform the same steps below for the frontend, but replace any mention of `backe
 
 ### API Endpoints
 
-- `GET /` - base endpoint with timestamp
-- TODO: List other endpoints.
+#### Customer Endpoints
+
+- `POST /customers` - create a new customer
+- `GET /customers/:customerId` - get customer by ID
+
+#### Account Endpoints
+
+- `POST /accounts` - create a new account
+- `GET /accounts/:accountId` - get account by ID
+- `POST /accounts/transfer` - transfer money between accounts
+
+#### Transaction Endpoints
+
+- `GET /transactions/account/:accountId` - get transactions by account ID
 
 ## Environment Variables
 
