@@ -159,11 +159,17 @@ export class TransactionController {
       return res.status(400).json({ error: 'Account ID is required' });
     }
 
+    const page = req.query.page ? parseInt(req.query.page as string) : 0;
+    const limit = req.query.limit ? parseInt(req.query.limit as string) : 10;
+
     try {
-      const transactions = await TransactionService.getTransactionsByAccountId(
-        requestParams
-      );
-      return res.status(200).json(transactions);
+      const { transactions, hasMore } =
+        await TransactionService.getTransactionsByAccountId(
+          requestParams,
+          page,
+          limit
+        );
+      return res.status(200).json({ transactions, hasMore });
     } catch (error) {
       console.error(error);
 

@@ -131,13 +131,17 @@ export class AccountService {
 
 export class TransactionService {
   static async getTransactionsByAccountId(
-    request: GetTransactionsByAccountIdRequest
-  ): Promise<Transaction[]> {
+    request: GetTransactionsByAccountIdRequest,
+    page: number,
+    limit: number
+  ): Promise<{ transactions: Transaction[]; hasMore: boolean }> {
     try {
-      const transactions = await store.getTransactionsByAccountId(
-        request.accountId
+      const { transactions, hasMore } = await store.getTransactionsByAccountId(
+        request.accountId,
+        page,
+        limit
       );
-      return transactions;
+      return { transactions, hasMore };
     } catch (error) {
       throw error;
     }

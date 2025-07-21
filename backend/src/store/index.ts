@@ -37,12 +37,22 @@ class InMemoryStore {
     return this.transactions.find((transaction) => transaction.id === id);
   }
 
-  async getTransactionsByAccountId(accountId: string): Promise<Transaction[]> {
-    return this.transactions.filter(
+  async getTransactionsByAccountId(
+    accountId: string,
+    page: number,
+    limit: number
+  ): Promise<{ transactions: Transaction[]; hasMore: boolean }> {
+    const startIndex = page * limit;
+    const endIndex = startIndex + limit;
+    const transactions = this.transactions.filter(
       (transaction) =>
         transaction.fromAccountId === accountId ||
         transaction.toAccountId === accountId
     );
+    const relevantTransactions = transactions.slice(startIndex, endIndex);
+    const hasMore = endIndex < transactions.length;
+
+    return { transactions: relevantTransactions, hasMore };
   }
 
   async clearAll() {
