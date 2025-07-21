@@ -67,4 +67,5 @@ Create a `.env` file in the backend directory for environment-specific configura
 
 ```
 PORT=3001
+SEED_DATABASE=true
 ```
