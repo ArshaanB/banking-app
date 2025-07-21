@@ -107,12 +107,6 @@ class ApiClient {
       body: JSON.stringify(data)
     });
   }
-
-  async getAccountBalance(accountId: string): Promise<AccountBalanceResponse> {
-    return this.request<AccountBalanceResponse>(
-      `/api/accounts/${accountId}/balance`
-    );
-  }
 }
 
 export const apiClient = new ApiClient(API_BASE_URL);
