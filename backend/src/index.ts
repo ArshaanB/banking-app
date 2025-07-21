@@ -4,6 +4,7 @@ import express from 'express';
 import morgan from 'morgan';
 import cors from 'cors';
 import apiRoutes from './routes';
+import { seedDatabase } from './store/seed';
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -33,8 +34,21 @@ app.get('/', (req, res) => {
 
 app.use('/api', apiRoutes);
 
-app.listen(PORT, () => {
-  console.log(`API Server running on port ${PORT}`);
-});
+async function startServer() {
+  // Seed database
+  if (process.env.SEED_DATABASE === 'true') {
+    try {
+      await seedDatabase();
+    } catch (error) {
+      console.error('Error seeding database:', error);
+    }
+  }
+
+  app.listen(PORT, () => {
+    console.log(`API Server running on port ${PORT}`);
+  });
+}
+
+startServer();
 
 export default app;
