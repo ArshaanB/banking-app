@@ -2,7 +2,7 @@
 
 import type React from 'react';
 import { useState } from 'react';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '@/lib/api';
 
 import {
@@ -27,10 +27,11 @@ import {
 import CreateNewEntity from '@/components/create-new-entity';
 
 export default function Accounts() {
+  const queryClient = useQueryClient();
   const [accountId, setAccountId] = useState('');
   const [fromAccountId, setFromAccountId] = useState('');
   const [toAccountId, setToAccountId] = useState('');
-  const [transferAmount, setTransferAmount] = useState('');
+  const [transferAmount, setTransferAmount] = useState(100);
 
   const createAccountMutationFn = (args: {
     customerId: string;
@@ -61,7 +62,21 @@ export default function Accounts() {
       fromAccountId: string;
       toAccountId: string;
       amount: number;
-    }) => apiClient.transferMoney(args)
+    }) => apiClient.transferMoney(args),
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: ['transactions', variables.fromAccountId]
+      });
+      queryClient.invalidateQueries({
+        queryKey: ['transactions', variables.toAccountId]
+      });
+      queryClient.invalidateQueries({
+        queryKey: ['account', variables.fromAccountId]
+      });
+      queryClient.invalidateQueries({
+        queryKey: ['account', variables.toAccountId]
+      });
+    }
   });
 
   const handleSearchAccount = (e: React.FormEvent<HTMLFormElement>) => {
@@ -73,11 +88,11 @@ export default function Accounts() {
 
   const handleTransferMoney = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (fromAccountId.trim() && toAccountId.trim() && transferAmount.trim()) {
+    if (fromAccountId.trim() && toAccountId.trim() && transferAmount) {
       transferMoney({
         fromAccountId,
         toAccountId,
-        amount: parseFloat(transferAmount)
+        amount: transferAmount
       });
     }
   };
@@ -107,7 +122,7 @@ export default function Accounts() {
           <CreateNewEntity
             mutationFn={createAccountMutationFn}
             entityTitle="Account"
-            initialState={{ customerId: '', balance: 0 }}
+            initialState={{ customerId: '', balance: 100 }}
           >
             {(args, setArgs, isPending) => (
               <>
@@ -132,7 +147,8 @@ export default function Accounts() {
                   <Input
                     id="balance"
                     type="number"
-                    placeholder="Enter balance"
+                    step="0.01"
+                    min="0.01"
                     value={args.balance}
                     onChange={(e) =>
                       setArgs((prev) => ({
@@ -291,9 +307,10 @@ export default function Accounts() {
                       type="number"
                       step="0.01"
                       min="0.01"
-                      placeholder="0.00"
                       value={transferAmount}
-                      onChange={(e) => setTransferAmount(e.target.value)}
+                      onChange={(e) =>
+                        setTransferAmount(parseFloat(e.target.value))
+                      }
                       required
                     />
                   </div>
@@ -304,7 +321,7 @@ export default function Accounts() {
                       isTransferring ||
                       !fromAccountId.trim() ||
                       !toAccountId.trim() ||
-                      !transferAmount.trim()
+                      transferAmount == 0
                     }
                   >
                     {isTransferring

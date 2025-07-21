@@ -35,6 +35,7 @@ const ITEMS_PER_PAGE = 10;
 
 export default function TransactionsPage() {
   const [accountId, setAccountId] = useState('');
+  const [searchedAccountId, setSearchedAccountId] = useState('');
   const [currentPage, setCurrentPage] = useState(0);
 
   const {
@@ -42,11 +43,17 @@ export default function TransactionsPage() {
     isLoading: isSearching,
     isError: isSearchError,
     isSuccess: isSearchSuccess,
-    isPlaceholderData
+    isPlaceholderData,
+    refetch: refetchTransactions
   } = useQuery<{ transactions: Transaction[]; hasMore: boolean }>({
     queryKey: ['transactions', accountId, currentPage],
-    queryFn: () =>
-      apiClient.getTransactions(accountId, currentPage, ITEMS_PER_PAGE),
+    queryFn: () => {
+      if (searchedAccountId !== accountId) {
+        setSearchedAccountId(accountId);
+        setCurrentPage(0);
+      }
+      return apiClient.getTransactions(accountId, currentPage, ITEMS_PER_PAGE);
+    },
     enabled: !!accountId,
     placeholderData: keepPreviousData
   });
@@ -59,6 +66,13 @@ export default function TransactionsPage() {
       hour: '2-digit',
       minute: '2-digit'
     });
+  };
+
+  const handleSearchTransactions = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (accountId.trim()) {
+      refetchTransactions();
+    }
   };
 
   return (
@@ -94,7 +108,7 @@ export default function TransactionsPage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <form className="flex gap-4">
+            <form className="flex gap-4" onSubmit={handleSearchTransactions}>
               <div className="flex-1 space-y-2">
                 <Label htmlFor="accountId">Account ID</Label>
                 <Input
